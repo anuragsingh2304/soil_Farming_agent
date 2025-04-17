@@ -1,0 +1,199 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useLanguage } from "@/lib/language-context"
+import { mockDistributors, type Distributor } from "@/lib/mock-data"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Search, MapPin, Phone, Wheat } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+export default function DistributorInformation() {
+  const { t } = useLanguage()
+  const [distributors, setDistributors] = useState<Distributor[]>([])
+  const [filteredDistributors, setFilteredDistributors] = useState<Distributor[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [regionFilter, setRegionFilter] = useState<string>("")
+  const [cropFilter, setCropFilter] = useState<string>("")
+  const [regions, setRegions] = useState<string[]>([])
+  const [crops, setCrops] = useState<string[]>([])
+
+  // Load mock distributors
+  useEffect(() => {
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setDistributors([...mockDistributors])
+      setFilteredDistributors([...mockDistributors])
+
+      // Extract unique regions and crops
+      const regionsSet = new Set<string>()
+      const cropsSet = new Set<string>()
+
+      mockDistributors.forEach((distributor) => {
+        regionsSet.add(distributor.region)
+
+        distributor.supportedCrops.split(",").forEach((crop) => {
+          cropsSet.add(crop.trim())
+        })
+      })
+
+      setRegions(Array.from(regionsSet).sort())
+      setCrops(Array.from(cropsSet).sort())
+
+      setLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Filter distributors based on search term and filters
+  useEffect(() => {
+    let filtered = distributors
+
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (distributor) =>
+          distributor.name.toLowerCase().includes(term) ||
+          distributor.address.toLowerCase().includes(term) ||
+          distributor.supportedCrops.toLowerCase().includes(term) ||
+          distributor.region.toLowerCase().includes(term),
+      )
+    }
+
+    if (regionFilter && regionFilter !== "all") {
+      filtered = filtered.filter((distributor) => distributor.region === regionFilter)
+    }
+
+    if (cropFilter && cropFilter !== "all") {
+      filtered = filtered.filter((distributor) =>
+        distributor.supportedCrops.toLowerCase().includes(cropFilter.toLowerCase()),
+      )
+    }
+
+    setFilteredDistributors(filtered)
+  }, [searchTerm, regionFilter, cropFilter, distributors])
+
+  const resetFilters = () => {
+    setSearchTerm("")
+    setRegionFilter("")
+    setCropFilter("")
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{t("distributorDetails")}</h1>
+        <p className="text-muted-foreground">Find distributors by region or crop type</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search distributors..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="w-full sm:w-1/2">
+            <Select value={regionFilter} onValueChange={setRegionFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder={`Filter by ${t("region")}`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                {regions.map((region) => (
+                  <SelectItem key={region} value={region}>
+                    {region}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="w-full sm:w-1/2">
+            <Select value={cropFilter} onValueChange={setCropFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder={`Filter by ${t("suitableCrops")}`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Crops</SelectItem>
+                {crops.map((crop) => (
+                  <SelectItem key={crop} value={crop}>
+                    {crop}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filteredDistributors.length === 0 ? (
+          <div className="md:col-span-2 lg:col-span-3 text-center py-6 text-muted-foreground">
+            No distributors found matching your criteria.
+            <button onClick={resetFilters} className="block mx-auto mt-2 text-primary hover:underline">
+              Reset filters
+            </button>
+          </div>
+        ) : (
+          filteredDistributors.map((distributor) => (
+            <Card key={distributor.id} className="overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle>{distributor.name}</CardTitle>
+                <CardDescription className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {distributor.region}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="text-sm font-medium mb-1">{t("address")}</div>
+                  <div className="text-sm text-muted-foreground">{distributor.address}</div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-medium mb-1">{t("phone")}</div>
+                  <div className="text-sm flex items-center gap-1">
+                    <Phone className="h-3 w-3" />
+                    {distributor.contact}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-medium mb-1 flex items-center gap-1">
+                    <Wheat className="h-3 w-3" />
+                    {t("suitableCrops")}
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {distributor.supportedCrops.split(",").map((crop, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {crop.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}

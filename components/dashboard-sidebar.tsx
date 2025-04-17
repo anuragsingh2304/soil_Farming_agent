@@ -74,7 +74,7 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="space-y-1 py-4">
+      <div className="space-y-1 py-2">
         {routes.map((route) => (
           <Link
             key={route.href}
@@ -94,8 +94,8 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
         ))}
       </div>
 
-      <div className="mt-auto border-t py-4">
-        <div className="px-3 mb-6 flex items-center justify-between">
+      <div className="mt-auto border-t py-2">
+        <div className="px-3 mb-2 flex items-center justify-between">
           <ThemeToggle />
           <LanguageSwitcher />
         </div>
@@ -114,7 +114,7 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
   return (
     <>
       {/* Mobile sidebar */}
-      <div className="md:hidden flex items-center h-16 px-4 border-b bg-background">
+      <div className="md:hidden flex items-center h-12 px-4 border-b bg-background">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="mr-2">
@@ -123,7 +123,7 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0 border-r">
-            <div className="p-4 border-b flex items-center justify-between">
+            <div className="p-3 border-b flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sprout className="h-5 w-5 text-primary" />
                 <span className="font-semibold">{isAdmin ? "Admin Portal" : "User Portal"}</span>
@@ -147,7 +147,7 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
 
       {/* Desktop sidebar */}
       <div className="hidden md:flex flex-col w-64 border-r h-screen bg-background">
-        <div className="p-6 border-b flex items-center gap-2">
+        <div className="p-4 border-b flex items-center gap-2">
           <Sprout className="h-6 w-6 text-primary" />
           <h2 className="text-lg font-semibold">{isAdmin ? "Admin Portal" : "User Portal"}</h2>
         </div>

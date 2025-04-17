@@ -39,13 +39,13 @@ export default function UserDashboardLayout({
     <div className="flex flex-col md:flex-row h-screen w-full">
       <DashboardSidebar isAdmin={false} />
       <div className="flex-1 flex flex-col overflow-hidden w-full">
-        <header className="h-16 border-b flex items-center justify-end px-6 bg-background">
+        <header className="h-12 border-b flex items-center justify-end px-4 bg-background">
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle />
             <LanguageSwitcher />
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6 bg-background w-full">{children}</main>
+        <main className="flex-1 overflow-auto p-3 bg-background w-full">{children}</main>
       </div>
     </div>
   )

@@ -68,13 +68,13 @@ export function MainNav() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-64 p-0">
-            <div className="p-4 border-b flex items-center justify-between">
+            <div className="p-3 border-b flex items-center justify-between">
               <div className="font-semibold">Navigation</div>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex flex-col gap-1 p-4">
+            <div className="flex flex-col gap-1 p-3">
               {routes.map((route) => (
                 <Link
                   key={route.href}
@@ -91,7 +91,7 @@ export function MainNav() {
                   {route.label}
                 </Link>
               ))}
-              <div className="mt-4 pt-4 border-t flex items-center justify-between">
+              <div className="mt-4 pt-2 border-t flex items-center justify-between">
                 <LanguageSwitcher />
               </div>
             </div>

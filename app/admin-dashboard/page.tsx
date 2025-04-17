@@ -11,13 +11,13 @@ export default function AdminDashboard() {
   const { user } = useAuth()
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-3">
+      <div className="mb-2">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Admin Dashboard</h1>
         <p className="text-muted-foreground">Welcome back, {user?.name || user?.email}</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/admin-dashboard/soil" className="block w-full">
           <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -6,8 +6,6 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { LanguageSwitcher } from "@/components/language-switcher"
 
 export default function AdminDashboardLayout({
   children,
@@ -39,13 +37,7 @@ export default function AdminDashboardLayout({
     <div className="flex flex-col md:flex-row h-screen w-full">
       <DashboardSidebar isAdmin={true} />
       <div className="flex-1 flex flex-col overflow-hidden w-full">
-        <header className="h-12 border-b flex items-center justify-end px-4 bg-background">
-          <div className="hidden md:flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageSwitcher />
-          </div>
-        </header>
-        <main className="flex-1 overflow-auto p-3 bg-background w-full">{children}</main>
+        <main className="flex-1 overflow-auto p-2 bg-background w-full">{children}</main>
       </div>
     </div>
   )

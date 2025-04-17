@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, Layers, Users, ClipboardList, LogOut, Menu, X, ChevronRight, Sprout } from "lucide-react"
+import { LayoutDashboard, Layers, Users, ClipboardList, LogOut, Menu, ChevronRight, Sprout } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -122,14 +122,28 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
               <span className="sr-only">Toggle sidebar</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 border-r">
+          <SheetContent side="left" className="w-64 p-0 border-r" closeButton={false}>
             <div className="p-3 border-b flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sprout className="h-5 w-5 text-primary" />
                 <span className="font-semibold">{isAdmin ? "Admin Portal" : "User Portal"}</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
-                <X className="h-4 w-4" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4"
+                >
+                  <path d="M18 6 6 18"></path>
+                  <path d="m6 6 12 12"></path>
+                </svg>
               </Button>
             </div>
             <div className="px-2">

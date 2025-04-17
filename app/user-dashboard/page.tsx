@@ -11,20 +11,20 @@ export default function UserDashboard() {
   const { user } = useAuth()
 
   return (
-    <div className="space-y-3">
-      <div className="mb-2">
+    <div className="space-y-2">
+      <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">User Dashboard</h1>
         <p className="text-muted-foreground">Welcome, {user?.name || user?.email}</p>
       </div>
 
-      <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
+      <div className="grid gap-2 grid-cols-1 md:grid-cols-2">
         <Link href="/user-dashboard/soil" className="block w-full">
           <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-2 px-3">
               <CardTitle className="text-sm font-medium">{t("soilDetails")}</CardTitle>
               <Layers className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 pb-2 pt-0">
               <div className="text-xl md:text-2xl font-bold">View Soil Information</div>
               <p className="text-xs text-muted-foreground">Browse soil types and their characteristics</p>
             </CardContent>
@@ -33,11 +33,11 @@ export default function UserDashboard() {
 
         <Link href="/user-dashboard/distributors" className="block w-full">
           <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-2 px-3">
               <CardTitle className="text-sm font-medium">{t("distributorDetails")}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 pb-2 pt-0">
               <div className="text-xl md:text-2xl font-bold">Find Distributors</div>
               <p className="text-xs text-muted-foreground">Find distributors by region or crop type</p>
             </CardContent>

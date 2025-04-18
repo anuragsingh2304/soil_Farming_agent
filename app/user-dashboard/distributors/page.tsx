@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { mockDistributors, type Distributor, indianStates, indianCities } from "@/lib/mock-data"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, MapPin, Phone, Wheat } from "lucide-react"
+import { Search, MapPin, Phone, Wheat, Store } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export default function DistributorInformation() {
   const { t } = useLanguage()
@@ -201,9 +202,9 @@ export default function DistributorInformation() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-4">
         {filteredDistributors.length === 0 ? (
-          <div className="md:col-span-2 lg:col-span-3 text-center py-6 text-muted-foreground">
+          <div className="text-center py-6 text-muted-foreground">
             No distributors found matching your criteria.
             <button onClick={resetFilters} className="block mx-auto mt-2 text-primary hover:underline">
               Reset filters
@@ -212,42 +213,58 @@ export default function DistributorInformation() {
         ) : (
           filteredDistributors.map((distributor) => (
             <Card key={distributor.id} className="overflow-hidden">
-              <CardContent className="p-4 space-y-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-3">
+                <div className="relative h-48 md:h-full">
+                  {distributor.image ? (
+                    <Image
+                      src={distributor.image || "/placeholder.svg"}
+                      alt={distributor.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-muted flex items-center justify-center">
+                      <Store className="h-12 w-12 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="md:col-span-2 p-4">
                   <h3 className="font-semibold text-lg">{distributor.name}</h3>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
                     <MapPin className="h-3 w-3" />
                     {distributor.city}, {distributor.state}
                   </div>
-                </div>
 
-                <div>
-                  <div className="text-sm font-medium mb-1">{t("address")}</div>
-                  <div className="text-sm text-muted-foreground">{distributor.address}</div>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <div className="text-sm font-medium mb-1">{t("address")}</div>
+                      <div className="text-sm text-muted-foreground">{distributor.address}</div>
+                    </div>
 
-                <div>
-                  <div className="text-sm font-medium mb-1">{t("phone")}</div>
-                  <div className="text-sm flex items-center gap-1">
-                    <Phone className="h-3 w-3" />
-                    {distributor.contact}
+                    <div>
+                      <div className="text-sm font-medium mb-1">{t("phone")}</div>
+                      <div className="text-sm flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        {distributor.contact}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <div className="text-sm font-medium mb-1 flex items-center gap-1">
+                      <Wheat className="h-3 w-3" />
+                      {t("suitableCrops")}
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {distributor.supportedCrops.split(",").map((crop, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {crop.trim()}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <div className="text-sm font-medium mb-1 flex items-center gap-1">
-                    <Wheat className="h-3 w-3" />
-                    {t("suitableCrops")}
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {distributor.supportedCrops.split(",").map((crop, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {crop.trim()}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
+              </div>
             </Card>
           ))
         )}

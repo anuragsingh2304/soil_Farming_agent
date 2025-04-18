@@ -31,6 +31,7 @@ export interface Distributor {
   state: string
   city: string
   createdAt: Date
+  image: string // Added image field
 }
 
 export interface Log {
@@ -158,6 +159,7 @@ export const mockDistributors: Distributor[] = [
     state: "Delhi",
     city: "New Delhi",
     createdAt: new Date("2023-01-10"),
+    image: "/images/shop-1.jpg",
   },
   {
     id: "dist-2",
@@ -169,6 +171,7 @@ export const mockDistributors: Distributor[] = [
     state: "Maharashtra",
     city: "Mumbai",
     createdAt: new Date("2023-01-25"),
+    image: "/images/shop-2.jpg",
   },
   {
     id: "dist-3",
@@ -180,6 +183,7 @@ export const mockDistributors: Distributor[] = [
     state: "Tamil Nadu",
     city: "Chennai",
     createdAt: new Date("2023-02-15"),
+    image: "/images/shop-3.jpg",
   },
   {
     id: "dist-4",
@@ -191,6 +195,7 @@ export const mockDistributors: Distributor[] = [
     state: "West Bengal",
     city: "Kolkata",
     createdAt: new Date("2023-03-05"),
+    image: "/images/shop-4.jpg",
   },
   {
     id: "dist-5",
@@ -202,6 +207,7 @@ export const mockDistributors: Distributor[] = [
     state: "Madhya Pradesh",
     city: "Bhopal",
     createdAt: new Date("2023-03-20"),
+    image: "/images/shop-5.jpg",
   },
   {
     id: "dist-6",
@@ -213,6 +219,7 @@ export const mockDistributors: Distributor[] = [
     state: "Punjab",
     city: "Ludhiana",
     createdAt: new Date("2023-04-05"),
+    image: "/images/shop-6.jpg",
   },
   {
     id: "dist-7",
@@ -224,6 +231,7 @@ export const mockDistributors: Distributor[] = [
     state: "Gujarat",
     city: "Ahmedabad",
     createdAt: new Date("2023-04-15"),
+    image: "/images/shop-7.jpg",
   },
   {
     id: "dist-8",
@@ -235,6 +243,7 @@ export const mockDistributors: Distributor[] = [
     state: "Karnataka",
     city: "Bangalore",
     createdAt: new Date("2023-05-01"),
+    image: "/images/shop-8.jpg",
   },
 ]
 

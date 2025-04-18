@@ -20,9 +20,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, ImageIcon } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { ImageUpload } from "@/components/image-upload"
+import Image from "next/image"
 
 export default function SoilManagement() {
   const { t } = useLanguage()
@@ -38,6 +40,11 @@ export default function SoilManagement() {
     characteristics: "",
     suitableCrops: "",
     region: "",
+    image: "",
+    ph: "",
+    nutrientContent: "",
+    waterRetention: "",
+    cultivation: "",
   })
 
   const [currentSoilId, setCurrentSoilId] = useState<string | null>(null)
@@ -61,12 +68,24 @@ export default function SoilManagement() {
     }))
   }
 
+  const handleImageChange = (imageUrl: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: imageUrl,
+    }))
+  }
+
   const resetForm = () => {
     setFormData({
       type: "",
       characteristics: "",
       suitableCrops: "",
       region: "",
+      image: "",
+      ph: "",
+      nutrientContent: "",
+      waterRetention: "",
+      cultivation: "",
     })
     setCurrentSoilId(null)
   }
@@ -100,6 +119,11 @@ export default function SoilManagement() {
       characteristics: soil.characteristics,
       suitableCrops: soil.suitableCrops,
       region: soil.region,
+      image: soil.image || "",
+      ph: soil.ph || "",
+      nutrientContent: soil.nutrientContent || "",
+      waterRetention: soil.waterRetention || "",
+      cultivation: soil.cultivation || "",
     })
     setCurrentSoilId(soil.id)
     setIsEditDialogOpen(true)
@@ -163,7 +187,7 @@ export default function SoilManagement() {
               Add Soil Type
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Soil Type</DialogTitle>
               <DialogDescription>Enter the details for the new soil type</DialogDescription>
@@ -175,10 +199,17 @@ export default function SoilManagement() {
               </Alert>
             )}
             <form onSubmit={handleAddSoil} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="type">{t("soilType")}</Label>
-                <Input id="type" name="type" value={formData.type} onChange={handleInputChange} required />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type">{t("soilType")}</Label>
+                  <Input id="type" name="type" value={formData.type} onChange={handleInputChange} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="region">{t("region")}</Label>
+                  <Input id="region" name="region" value={formData.region} onChange={handleInputChange} required />
+                </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="characteristics">{t("characteristics")}</Label>
                 <Textarea
@@ -189,20 +220,60 @@ export default function SoilManagement() {
                   required
                 />
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="suitableCrops">{t("suitableCrops")}</Label>
+                  <Input
+                    id="suitableCrops"
+                    name="suitableCrops"
+                    value={formData.suitableCrops}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ph">pH Level</Label>
+                  <Input id="ph" name="ph" value={formData.ph} onChange={handleInputChange} required />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="suitableCrops">{t("suitableCrops")}</Label>
-                <Input
-                  id="suitableCrops"
-                  name="suitableCrops"
-                  value={formData.suitableCrops}
+                <Label htmlFor="nutrientContent">Nutrient Content</Label>
+                <Textarea
+                  id="nutrientContent"
+                  name="nutrientContent"
+                  value={formData.nutrientContent}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="region">{t("region")}</Label>
-                <Input id="region" name="region" value={formData.region} onChange={handleInputChange} required />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="waterRetention">Water Retention</Label>
+                  <Input
+                    id="waterRetention"
+                    name="waterRetention"
+                    value={formData.waterRetention}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cultivation">Cultivation Practices</Label>
+                  <Input
+                    id="cultivation"
+                    name="cultivation"
+                    value={formData.cultivation}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
+
+              <ImageUpload currentImage={formData.image} onImageChange={handleImageChange} label="Soil Image" />
+
               <DialogFooter>
                 <Button type="submit">Add Soil Type</Button>
               </DialogFooter>
@@ -224,6 +295,7 @@ export default function SoilManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Image</TableHead>
                     <TableHead>{t("soilType")}</TableHead>
                     <TableHead className="hidden md:table-cell">{t("characteristics")}</TableHead>
                     <TableHead>{t("suitableCrops")}</TableHead>
@@ -234,6 +306,22 @@ export default function SoilManagement() {
                 <TableBody>
                   {soilTypes.map((soil) => (
                     <TableRow key={soil.id}>
+                      <TableCell>
+                        {soil.image ? (
+                          <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                            <Image
+                              src={soil.image || "/placeholder.svg"}
+                              alt={soil.type}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center">
+                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="font-medium">{soil.type}</TableCell>
                       <TableCell className="max-w-xs truncate hidden md:table-cell">{soil.characteristics}</TableCell>
                       <TableCell className="max-w-[150px] truncate">{soil.suitableCrops}</TableCell>
@@ -259,7 +347,7 @@ export default function SoilManagement() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Soil Type</DialogTitle>
             <DialogDescription>Update the details for this soil type</DialogDescription>
@@ -271,10 +359,17 @@ export default function SoilManagement() {
             </Alert>
           )}
           <form onSubmit={handleUpdateSoil} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-type">{t("soilType")}</Label>
-              <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} required />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-type">{t("soilType")}</Label>
+                <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-region">{t("region")}</Label>
+                <Input id="edit-region" name="region" value={formData.region} onChange={handleInputChange} required />
+              </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="edit-characteristics">{t("characteristics")}</Label>
               <Textarea
@@ -285,20 +380,60 @@ export default function SoilManagement() {
                 required
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-suitableCrops">{t("suitableCrops")}</Label>
+                <Input
+                  id="edit-suitableCrops"
+                  name="suitableCrops"
+                  value={formData.suitableCrops}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-ph">pH Level</Label>
+                <Input id="edit-ph" name="ph" value={formData.ph} onChange={handleInputChange} required />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="edit-suitableCrops">{t("suitableCrops")}</Label>
-              <Input
-                id="edit-suitableCrops"
-                name="suitableCrops"
-                value={formData.suitableCrops}
+              <Label htmlFor="edit-nutrientContent">Nutrient Content</Label>
+              <Textarea
+                id="edit-nutrientContent"
+                name="nutrientContent"
+                value={formData.nutrientContent}
                 onChange={handleInputChange}
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-region">{t("region")}</Label>
-              <Input id="edit-region" name="region" value={formData.region} onChange={handleInputChange} required />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-waterRetention">Water Retention</Label>
+                <Input
+                  id="edit-waterRetention"
+                  name="waterRetention"
+                  value={formData.waterRetention}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-cultivation">Cultivation Practices</Label>
+                <Input
+                  id="edit-cultivation"
+                  name="cultivation"
+                  value={formData.cultivation}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
+
+            <ImageUpload currentImage={formData.image} onImageChange={handleImageChange} label="Soil Image" />
+
             <DialogFooter>
               <Button type="submit">Update Soil Type</Button>
             </DialogFooter>

@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { mockSoilTypes, type SoilType } from "@/lib/mock-data"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
+import Link from "next/link"
 
 export default function SoilInformation() {
   const { t } = useLanguage()
@@ -54,9 +55,9 @@ export default function SoilInformation() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("soilDetails")}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t("soilDetails")}</h1>
         <p className="text-muted-foreground">Browse soil types and their characteristics</p>
       </div>
 
@@ -71,54 +72,39 @@ export default function SoilInformation() {
         />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Soil Types</CardTitle>
-          <CardDescription>Detailed information about different soil types</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {filteredSoilTypes.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground">No soil types found matching your search.</div>
-          ) : (
-            <Accordion type="single" collapsible className="w-full">
-              {filteredSoilTypes.map((soil) => (
-                <AccordionItem key={soil.id} value={soil.id}>
-                  <AccordionTrigger className="hover:bg-muted/50 px-4 py-2 rounded-md">
-                    <div className="flex items-center gap-2 text-left">
-                      <span className="font-medium">{soil.type}</span>
-                      <Badge variant="outline" className="ml-2">
-                        {soil.region}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-semibold mb-1">{t("characteristics")}</h4>
-                        <p className="text-sm">{soil.characteristics}</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-1">{t("suitableCrops")}</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {soil.suitableCrops.split(",").map((crop, index) => (
-                            <Badge key={index} variant="secondary">
-                              {crop.trim()}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-1">{t("region")}</h4>
-                        <p className="text-sm">{soil.region}</p>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-        </CardContent>
-      </Card>
+      {filteredSoilTypes.length === 0 ? (
+        <div className="text-center py-6 text-muted-foreground">No soil types found matching your search.</div>
+      ) : (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredSoilTypes.map((soil) => (
+            <Link href={`/user-dashboard/soil/${soil.id}`} key={soil.id}>
+              <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer h-full">
+                <div className="relative h-48 w-full">
+                  <Image src={soil.image || "/placeholder.svg"} alt={soil.type} fill className="object-cover" />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg mb-2">{soil.type}</h3>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {soil.suitableCrops
+                      .split(",")
+                      .slice(0, 3)
+                      .map((crop, index) => (
+                        <Badge key={index} variant="secondary">
+                          {crop.trim()}
+                        </Badge>
+                      ))}
+                    {soil.suitableCrops.split(",").length > 3 && (
+                      <Badge variant="outline">+{soil.suitableCrops.split(",").length - 3}</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{soil.characteristics}</p>
+                  <div className="mt-2 text-xs font-medium text-muted-foreground">{soil.region}</div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
-import { mockDistributors, type Distributor } from "@/lib/mock-data"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { mockDistributors, type Distributor, indianStates, indianCities } from "@/lib/mock-data"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search, MapPin, Phone, Wheat } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 
 export default function DistributorInformation() {
   const { t } = useLanguage()
@@ -17,8 +18,11 @@ export default function DistributorInformation() {
   const [searchTerm, setSearchTerm] = useState("")
   const [regionFilter, setRegionFilter] = useState<string>("")
   const [cropFilter, setCropFilter] = useState<string>("")
+  const [stateFilter, setStateFilter] = useState<string>("")
+  const [cityFilter, setCityFilter] = useState<string>("")
   const [regions, setRegions] = useState<string[]>([])
   const [crops, setCrops] = useState<string[]>([])
+  const [availableCities, setAvailableCities] = useState<string[]>([])
 
   // Load mock distributors
   useEffect(() => {
@@ -48,6 +52,17 @@ export default function DistributorInformation() {
     return () => clearTimeout(timer)
   }, [])
 
+  // Update available cities when state changes
+  useEffect(() => {
+    if (stateFilter) {
+      setAvailableCities(indianCities[stateFilter] || [])
+      setCityFilter("")
+    } else {
+      setAvailableCities([])
+      setCityFilter("")
+    }
+  }, [stateFilter])
+
   // Filter distributors based on search term and filters
   useEffect(() => {
     let filtered = distributors
@@ -73,13 +88,23 @@ export default function DistributorInformation() {
       )
     }
 
+    if (stateFilter) {
+      filtered = filtered.filter((distributor) => distributor.state === stateFilter)
+
+      if (cityFilter) {
+        filtered = filtered.filter((distributor) => distributor.city === cityFilter)
+      }
+    }
+
     setFilteredDistributors(filtered)
-  }, [searchTerm, regionFilter, cropFilter, distributors])
+  }, [searchTerm, regionFilter, cropFilter, stateFilter, cityFilter, distributors])
 
   const resetFilters = () => {
     setSearchTerm("")
     setRegionFilter("")
     setCropFilter("")
+    setStateFilter("")
+    setCityFilter("")
   }
 
   if (loading) {
@@ -91,9 +116,9 @@ export default function DistributorInformation() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("distributorDetails")}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t("distributorDetails")}</h1>
         <p className="text-muted-foreground">Find distributors by region or crop type</p>
       </div>
 
@@ -109,39 +134,71 @@ export default function DistributorInformation() {
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="w-full sm:w-1/2">
-            <Select value={regionFilter} onValueChange={setRegionFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder={`Filter by ${t("region")}`} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Regions</SelectItem>
-                {regions.map((region) => (
-                  <SelectItem key={region} value={region}>
-                    {region}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <Select value={regionFilter} onValueChange={setRegionFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder={`Filter by ${t("region")}`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Regions</SelectItem>
+              {regions.map((region) => (
+                <SelectItem key={region} value={region}>
+                  {region}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <div className="w-full sm:w-1/2">
-            <Select value={cropFilter} onValueChange={setCropFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder={`Filter by ${t("suitableCrops")}`} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Crops</SelectItem>
-                {crops.map((crop) => (
-                  <SelectItem key={crop} value={crop}>
-                    {crop}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={cropFilter} onValueChange={setCropFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder={`Filter by ${t("suitableCrops")}`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Crops</SelectItem>
+              {crops.map((crop) => (
+                <SelectItem key={crop} value={crop}>
+                  {crop}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={stateFilter} onValueChange={setStateFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select State" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All States</SelectItem>
+              {indianStates.map((state) => (
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={cityFilter} onValueChange={setCityFilter} disabled={!stateFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select City" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Cities</SelectItem>
+              {availableCities.map((city) => (
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {(searchTerm || regionFilter || cropFilter || stateFilter || cityFilter) && (
+          <div className="flex justify-end">
+            <Button variant="outline" size="sm" onClick={resetFilters}>
+              Reset Filters
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -155,14 +212,15 @@ export default function DistributorInformation() {
         ) : (
           filteredDistributors.map((distributor) => (
             <Card key={distributor.id} className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle>{distributor.name}</CardTitle>
-                <CardDescription className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {distributor.region}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-4 space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg">{distributor.name}</h3>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <MapPin className="h-3 w-3" />
+                    {distributor.city}, {distributor.state}
+                  </div>
+                </div>
+
                 <div>
                   <div className="text-sm font-medium mb-1">{t("address")}</div>
                   <div className="text-sm text-muted-foreground">{distributor.address}</div>

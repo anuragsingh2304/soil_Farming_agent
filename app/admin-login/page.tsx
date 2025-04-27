@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 
+
 export default function AdminLogin() {
   const { t } = useLanguage()
   const { adminLogin, loading } = useAuth()
@@ -76,9 +77,6 @@ export default function AdminLogin() {
           </CardContent>
           <CardFooter className="flex flex-col justify-center">
             <p className="text-sm text-muted-foreground">Admin access is restricted to authorized personnel only</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              For UI testing, use any email containing "admin" with any password.
-            </p>
           </CardFooter>
         </Card>
       </main>

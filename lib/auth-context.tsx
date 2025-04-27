@@ -37,17 +37,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
+      // call to the backend for login
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+    
+      const data = await response.json();
+    
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+    
       // For UI testing, allow any email containing "user" to log in
-      if (email.includes("user")) {
+      if (response.ok) {
         const testUser = {
-          uid: "user-test",
-          email: email,
-          name: "Test User",
-          role: "user" as const,
+          uid: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          isAdmin: data.user.isAdmin,
         }
 
         setUser(testUser)
@@ -73,37 +84,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Admin login - simplified for UI testing
   const adminLogin = async (email: string, password: string) => {
     try {
-      setLoading(true)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // For UI testing, allow any email containing "admin" to log in
-      if (email.includes("admin")) {
-        const testAdmin = {
-          uid: "admin-test",
-          email: email,
-          name: "Test Admin",
-          role: "admin" as const,
-        }
-
-        setUser(testAdmin)
-        try {
-          localStorage.setItem("currentUser", JSON.stringify(testAdmin))
-        } catch (error) {
-          console.error("Error saving to localStorage:", error)
-        }
-
-        router.push("/admin-dashboard")
-        return
+      setLoading(true);
+  
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
-
-      throw new Error("Invalid admin credentials")
+  
+      // Check if user is actually an Admin
+      if (!data.user.isAdmin) {
+        throw new Error('Access denied. Not an admin.');
+      }
+  
+      const testAdmin = {
+        uid: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        isAdmin: data.user.isAdmin,
+      };
+  
+      setUser(testAdmin);
+      
+      try {
+        localStorage.setItem("currentUser", JSON.stringify(testAdmin));
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
+  
+      router.push("/admin-dashboard");
+      return;
+      // Only redirect if admin verified
     } catch (error: any) {
-      console.error("Admin login error:", error.message)
-      throw error
+      console.error("Admin login error:", error.message);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -119,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         uid: `user-${Date.now()}`,
         email,
         name,
-        role: "user",
+        isAdmin: false,
       }
 
       setUser(newUser)

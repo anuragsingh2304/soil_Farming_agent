@@ -4,7 +4,7 @@ export interface User {
   uid: string
   email: string
   name?: string
-  role: "admin" | "user"
+  isAdmin: true | false
 }
 
 export interface SoilType {
@@ -51,25 +51,25 @@ export const mockUsers: User[] = [
     uid: "admin-1",
     email: "admin@example.com",
     name: "Admin User",
-    role: "admin",
+    isAdmin: true,
   },
   {
     uid: "user-1",
     email: "user@example.com",
     name: "Regular User",
-    role: "user",
+    isAdmin: false,
   },
   {
     uid: "test-admin",
     email: "test.admin@example.com",
     name: "Test Admin",
-    role: "admin",
+    isAdmin: true,
   },
   {
     uid: "test-user",
     email: "test.user@example.com",
     name: "Test User",
-    role: "user",
+    isAdmin: false,
   },
 ]
 

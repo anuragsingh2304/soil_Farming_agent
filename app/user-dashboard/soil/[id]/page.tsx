@@ -22,7 +22,7 @@ export default function SoilDetailPage() {
     const fetchSoil = async () => {
       try {
         const soilId = params.id as string
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/soil/${soilId}`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil/${soilId}`)
         if (!res.ok) {
           throw new Error("Failed to fetch soil data")
         }

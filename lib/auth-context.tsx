@@ -26,7 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check if user is stored in localStorage
     try {
-      const currentUser = async ()=> {
+      
+      currentUser()
+    } catch (error) {
+      console.error("Error getting user:", error);
+    } finally {
+      setIsInitializing(false);
+    }
+  }, [])
+
+  const currentUser = async ()=> {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/user`, {
           credentials: "include"
         });
@@ -38,13 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const Data = await res.json()
         setUser(Data)
       }
-      currentUser()
-    } catch (error) {
-      console.error("Error getting user:", error);
-    } finally {
-      setIsInitializing(false);
-    }
-  }, [])
 
 
   // Regular user login - simplified for UI testing
@@ -101,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
   
       const data = await response.json();
+      console.log(data)
   
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');

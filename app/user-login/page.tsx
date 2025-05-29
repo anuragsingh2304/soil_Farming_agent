@@ -17,8 +17,8 @@ import Link from "next/link"
 export default function UserLogin() {
   const { t } = useLanguage()
   const { login, loading } = useAuth()
-  const [email, setEmail] = useState("user@example.com")
-  const [password, setPassword] = useState("password")
+  const [email, setEmail] = useState("bharatsing12911@gmail.com")
+  const [password, setPassword] = useState("12345678")
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {

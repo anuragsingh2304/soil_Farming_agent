@@ -41,12 +41,7 @@ export function DashboardSidebar({ isAdmin = false }: SidebarProps) {
       icon: Users,
       active: pathname === "/admin-dashboard/distributors",
     },
-    {
-      href: "/admin-dashboard/logs",
-      label: t("viewLogs"),
-      icon: ClipboardList,
-      active: pathname === "/admin-dashboard/logs",
-    },
+   
   ]
 
   const userRoutes = [

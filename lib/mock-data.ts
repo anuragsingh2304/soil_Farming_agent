@@ -8,7 +8,7 @@ export interface User {
 }
 
 export interface SoilType {
-  id: string
+  _id: string
   type: string
   characteristics: string
   suitableCrops: string
@@ -22,7 +22,7 @@ export interface SoilType {
 }
 
 export interface Distributor {
-  id: string
+  _id: string
   name: string
   address: string
   supportedCrops: string
@@ -35,7 +35,7 @@ export interface Distributor {
 }
 
 export interface Log {
-  id: string
+  _id: string
   action: string
   timestamp: Date
   userId?: string
@@ -76,7 +76,7 @@ export const mockUsers: User[] = [
 // Mock soil types
 export const mockSoilTypes: SoilType[] = [
   {
-    id: "soil-1",
+    _id: "soil-1",
     type: "Alluvial Soil",
     characteristics:
       "Fertile, light-colored, high in minerals, found in river basins and deltas. These soils are formed by the deposition of sediments by rivers and are renewed annually.",
@@ -90,7 +90,7 @@ export const mockSoilTypes: SoilType[] = [
     cultivation: "Suitable for intensive agriculture with proper irrigation",
   },
   {
-    id: "soil-2",
+    _id: "soil-2",
     type: "Black Soil",
     characteristics:
       "Rich in clay, retains moisture, self-ploughing during dry season, high calcium carbonate content. Also known as Regur soil, it has a high capacity to hold moisture.",
@@ -104,7 +104,7 @@ export const mockSoilTypes: SoilType[] = [
     cultivation: "Develops cracks in summer which helps in aeration",
   },
   {
-    id: "soil-3",
+    _id: "soil-3",
     type: "Red Soil",
     characteristics:
       "Red color due to iron oxide, porous, low fertility, low moisture retention. These soils are formed due to weathering of ancient crystalline and metamorphic rocks.",
@@ -118,7 +118,7 @@ export const mockSoilTypes: SoilType[] = [
     cultivation: "Responds well to proper irrigation and fertilizers",
   },
   {
-    id: "soil-4",
+    _id: "soil-4",
     type: "Laterite Soil",
     characteristics:
       "Acidic, poor in organic matter, rich in iron and aluminum oxides. These soils are formed under conditions of high temperature and heavy rainfall with alternate wet and dry periods.",
@@ -132,7 +132,7 @@ export const mockSoilTypes: SoilType[] = [
     cultivation: "Requires heavy application of fertilizers and irrigation",
   },
   {
-    id: "soil-5",
+    _id: "soil-5",
     type: "Desert Soil",
     characteristics:
       "Sandy texture, low organic matter, high salt content, low moisture retention. These soils are found in arid regions with high temperature and low rainfall.",
@@ -150,7 +150,7 @@ export const mockSoilTypes: SoilType[] = [
 // Mock distributors
 export const mockDistributors: Distributor[] = [
   {
-    id: "dist-1",
+    _id: "dist-1",
     name: "Agro Solutions Ltd.",
     address: "123 Farm Road, Delhi, India",
     supportedCrops: "Rice, Wheat, Maize",
@@ -162,7 +162,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-1.jpg",
   },
   {
-    id: "dist-2",
+    _id: "dist-2",
     name: "Green Harvest Distributors",
     address: "456 Agriculture Lane, Mumbai, India",
     supportedCrops: "Cotton, Sugarcane, Pulses",
@@ -174,7 +174,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-2.jpg",
   },
   {
-    id: "dist-3",
+    _id: "dist-3",
     name: "Farmland Supplies",
     address: "789 Crop Street, Chennai, India",
     supportedCrops: "Rice, Millets, Groundnut",
@@ -186,7 +186,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-3.jpg",
   },
   {
-    id: "dist-4",
+    _id: "dist-4",
     name: "Eastern Agri Services",
     address: "321 Harvest Road, Kolkata, India",
     supportedCrops: "Tea, Rice, Jute",
@@ -198,7 +198,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-4.jpg",
   },
   {
-    id: "dist-5",
+    _id: "dist-5",
     name: "Central Farm Suppliers",
     address: "654 Seed Avenue, Bhopal, India",
     supportedCrops: "Wheat, Soybean, Pulses",
@@ -210,7 +210,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-5.jpg",
   },
   {
-    id: "dist-6",
+    _id: "dist-6",
     name: "Punjab Agro Traders",
     address: "78 Wheat Street, Ludhiana, India",
     supportedCrops: "Wheat, Rice, Maize",
@@ -222,7 +222,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-6.jpg",
   },
   {
-    id: "dist-7",
+    _id: "dist-7",
     name: "Gujarat Farm Solutions",
     address: "45 Cotton Road, Ahmedabad, India",
     supportedCrops: "Cotton, Groundnut, Wheat",
@@ -234,7 +234,7 @@ export const mockDistributors: Distributor[] = [
     image: "/images/shop-7.jpg",
   },
   {
-    id: "dist-8",
+    _id: "dist-8",
     name: "Karnataka Agri Supplies",
     address: "23 Coffee Lane, Bangalore, India",
     supportedCrops: "Coffee, Rice, Millets",
@@ -250,21 +250,21 @@ export const mockDistributors: Distributor[] = [
 // Mock logs
 export const mockLogs: Log[] = [
   {
-    id: "log-1",
+    _id: "log-1",
     action: "User Login",
     timestamp: new Date("2023-04-01T09:30:00"),
     userId: "user-1",
     email: "user@example.com",
   },
   {
-    id: "log-2",
+    _id: "log-2",
     action: "Admin Login",
     timestamp: new Date("2023-04-01T10:15:00"),
     userId: "admin-1",
     email: "admin@example.com",
   },
   {
-    id: "log-3",
+    _id: "log-3",
     action: "Soil Added",
     timestamp: new Date("2023-04-01T11:00:00"),
     userId: "admin-1",
@@ -272,7 +272,7 @@ export const mockLogs: Log[] = [
     soilType: "Alluvial Soil",
   },
   {
-    id: "log-4",
+    _id: "log-4",
     action: "Distributor Added",
     timestamp: new Date("2023-04-01T11:30:00"),
     userId: "admin-1",
@@ -280,13 +280,13 @@ export const mockLogs: Log[] = [
     distributorName: "Agro Solutions Ltd.",
   },
   {
-    id: "log-5",
+    _id: "log-5",
     action: "User Registration",
     timestamp: new Date("2023-04-01T14:00:00"),
     email: "newuser@example.com",
   },
   {
-    id: "log-6",
+    _id: "log-6",
     action: "Soil Updated",
     timestamp: new Date("2023-04-02T09:45:00"),
     userId: "admin-1",
@@ -294,7 +294,7 @@ export const mockLogs: Log[] = [
     soilType: "Black Soil",
   },
   {
-    id: "log-7",
+    _id: "log-7",
     action: "Distributor Updated",
     timestamp: new Date("2023-04-02T10:30:00"),
     userId: "admin-1",
@@ -302,7 +302,7 @@ export const mockLogs: Log[] = [
     distributorName: "Green Harvest Distributors",
   },
   {
-    id: "log-8",
+    _id: "log-8",
     action: "User Logout",
     timestamp: new Date("2023-04-02T16:00:00"),
     userId: "user-1",

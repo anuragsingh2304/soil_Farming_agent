@@ -17,8 +17,8 @@ import { AlertCircle } from "lucide-react"
 export default function AdminLogin() {
   const { t } = useLanguage()
   const { adminLogin, loading } = useAuth()
-  const [email, setEmail] = useState("admin@example.com")
-  const [password, setPassword] = useState("password")
+  const [email, setEmail] = useState("atulm7251@gmail.com")
+  const [password, setPassword] = useState("12345678")
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {

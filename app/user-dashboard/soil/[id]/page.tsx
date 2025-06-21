@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
-import { mockSoilTypes, type SoilType } from "@/lib/mock-data"
+import { type SoilType } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,25 +19,23 @@ export default function SoilDetailPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
+    const fetchSoil = async () => {
       try {
         const soilId = params.id as string
-        const foundSoil = mockSoilTypes.find((s) => s.id === soilId)
-
-        if (foundSoil) {
-          setSoil(foundSoil)
-        } else {
-          setError("Soil type not found")
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil/${soilId}`)
+        if (!res.ok) {
+          throw new Error("Failed to fetch soil data")
         }
+        const data = await res.json()
+        setSoil(data)
       } catch (err) {
-        setError("Error loading soil data")
+        setError("Soil type not found")
       } finally {
         setLoading(false)
       }
-    }, 1000)
+    }
 
-    return () => clearTimeout(timer)
+    fetchSoil()
   }, [params.id])
 
   if (loading) {
@@ -63,7 +61,9 @@ export default function SoilDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{soil.type}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          {t(soil.type)}
+          </h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

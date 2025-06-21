@@ -3,7 +3,7 @@
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Layers, Users, ClipboardList } from "lucide-react"
+import { Layers, Users, } from "lucide-react"
 import Link from "next/link"
 
 export default function AdminDashboard() {
@@ -44,18 +44,7 @@ export default function AdminDashboard() {
           </Card>
         </Link>
 
-        <Link href="/admin-dashboard/logs" className="block w-full">
-          <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-2 px-3">
-              <CardTitle className="text-sm font-medium">{t("viewLogs")}</CardTitle>
-              <ClipboardList className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="px-3 pb-2 pt-0">
-              <div className="text-xl md:text-2xl font-bold">Activity Logs</div>
-              <p className="text-xs text-muted-foreground">View all system activity and user actions</p>
-            </CardContent>
-          </Card>
-        </Link>
+        
       </div>
     </div>
   )

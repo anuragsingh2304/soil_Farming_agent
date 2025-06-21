@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation";
 import Link from "next/link"
 
 export default function Register() {
@@ -22,10 +23,13 @@ export default function Register() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setSuccess(null)
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
@@ -33,9 +37,27 @@ export default function Register() {
     }
 
     try {
-      await registerUser(email, password, name)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      // Optionally, you could redirect or show success message here
+      setSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        router.push('/user-login');  // 👈 Redirect to your login page
+      }, 2000); // 👈 waits for 2 seconds before redirecting
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
   }
 
@@ -53,6 +75,11 @@ export default function Register() {
               <Alert variant="destructive" className="mb-4">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {success && (
+              <Alert variant="default" className="mb-4">
+                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">

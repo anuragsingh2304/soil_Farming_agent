@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
-import { mockSoilTypes, type SoilType } from "@/lib/mock-data"
+import { type SoilType } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -49,16 +49,31 @@ export default function SoilManagement() {
 
   const [currentSoilId, setCurrentSoilId] = useState<string | null>(null)
 
-  // Load mock soil types
+  // Load soil types from API
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setSoilTypes([...mockSoilTypes])
-      setLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
+    const fetchSoils = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil`);
+        if (res.status === 204) {
+          setSoilTypes([]);
+        } else if (!res.ok) {
+          setSoilTypes([]);
+        } else {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setSoilTypes(data);
+          } else {
+            setSoilTypes([]);
+          }
+        }
+      } catch (error) {
+        setError("Failed to load soils");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSoils();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -91,25 +106,26 @@ export default function SoilManagement() {
   }
 
   const handleAddSoil = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      const newSoil: SoilType = {
-        id: `soil-${Date.now()}`,
-        ...formData,
-        createdAt: new Date(),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to add soil: ${errorText}`);
       }
-
-      setSoilTypes((prev) => [newSoil, ...prev])
-
-      resetForm()
-      setIsAddDialogOpen(false)
+      const newSoil = await response.json();
+      setSoilTypes((prev) => [newSoil, ...prev]);
+      resetForm();
+      setIsAddDialogOpen(false);
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
+      console.log(err.message)
     }
   }
 
@@ -124,47 +140,49 @@ export default function SoilManagement() {
       nutrientContent: soil.nutrientContent || "",
       waterRetention: soil.waterRetention || "",
       cultivation: soil.cultivation || "",
-    })
-    setCurrentSoilId(soil.id)
-    setIsEditDialogOpen(true)
+    });
+    setCurrentSoilId(soil._id);
+    setIsEditDialogOpen(true);
   }
 
   const handleUpdateSoil = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
-    if (!currentSoilId) return
+    if (!currentSoilId) return;
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      setSoilTypes((prev) => prev.map((soil) => (soil.id === currentSoilId ? { ...soil, ...formData } : soil)))
-
-      resetForm()
-      setIsEditDialogOpen(false)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil/${currentSoilId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const updated = await res.json();
+      setSoilTypes((prev) => prev.map((soil) => (soil._id === updated._id ? updated : soil)));
+      resetForm();
+      setIsEditDialogOpen(false);
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
   }
 
   const handleDeleteConfirm = (id: string) => {
-    setCurrentSoilId(id)
-    setIsDeleteDialogOpen(true)
+    setCurrentSoilId(id);
+    setIsDeleteDialogOpen(true);
   }
 
   const handleDeleteSoil = async () => {
-    if (!currentSoilId) return
+    if (!currentSoilId) return;
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      setSoilTypes((prev) => prev.filter((soil) => soil.id !== currentSoilId))
-      setIsDeleteDialogOpen(false)
-      setCurrentSoilId(null)
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil/${currentSoilId}`, {
+        method: "DELETE",
+      });
+      setSoilTypes((prev) => prev.filter((soil) => soil._id !== currentSoilId));
+      setIsDeleteDialogOpen(false);
+      setCurrentSoilId(null);
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
   }
 
@@ -305,7 +323,7 @@ export default function SoilManagement() {
                 </TableHeader>
                 <TableBody>
                   {soilTypes.map((soil) => (
-                    <TableRow key={soil.id}>
+                    <TableRow key={soil._id}>
                       <TableCell>
                         {soil.image ? (
                           <div className="relative h-12 w-12 rounded-md overflow-hidden">
@@ -331,7 +349,7 @@ export default function SoilManagement() {
                           <Pencil className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteConfirm(soil.id)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteConfirm(soil._id)}>
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Delete</span>
                         </Button>

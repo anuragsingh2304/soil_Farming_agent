@@ -8,7 +8,7 @@ import { Layers, Users } from "lucide-react"
 import { Sprout } from "lucide-react"
 
 export default function Home() {
-  const { t } = useLanguage()
+  const { t, isInitializing} = useLanguage()
 
   return (
     <div className="flex flex-col min-h-screen">

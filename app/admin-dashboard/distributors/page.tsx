@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
-import { mockDistributors, type Distributor, indianStates, indianCities } from "@/lib/mock-data"
+import { type Distributor, indianStates, indianCities } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -49,18 +49,26 @@ export default function DistributorManagement() {
 
   const [currentDistributorId, setCurrentDistributorId] = useState<string | null>(null)
 
-  // Load mock distributors
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setDistributors([...mockDistributors])
-      setLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
+    const fetchDistributors = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`)
+        if (!res.ok) {
+          throw new Error("Failed to fetch distributors")
+        }
+        const data = await res.json()
+        setDistributors(data)
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch distributors")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDistributors()
   }, [])
 
-  // Update available cities when state changes
   useEffect(() => {
     if (formData.state) {
       setAvailableCities(indianCities[formData.state] || [])
@@ -108,19 +116,16 @@ export default function DistributorManagement() {
   const handleAddDistributor = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      const newDistributor: Distributor = {
-        id: `dist-${Date.now()}`,
-        ...formData,
-        createdAt: new Date(),
-      }
-
-      setDistributors((prev) => [newDistributor, ...prev])
-
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      // Refresh list
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`)
+      const data = await res.json()
+      setDistributors(data)
       resetForm()
       setIsAddDialogOpen(false)
     } catch (err: any) {
@@ -139,26 +144,23 @@ export default function DistributorManagement() {
       city: distributor.city || "",
       image: distributor.image || "",
     })
-    setCurrentDistributorId(distributor.id)
+    setCurrentDistributorId(distributor._id)
     setIsEditDialogOpen(true)
   }
 
   const handleUpdateDistributor = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-
     if (!currentDistributorId) return
-
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      setDistributors((prev) =>
-        prev.map((distributor) =>
-          distributor.id === currentDistributorId ? { ...distributor, ...formData } : distributor,
-        ),
-      )
-
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors/${currentDistributorId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`)
+      const data = await res.json()
+      setDistributors(data)
       resetForm()
       setIsEditDialogOpen(false)
     } catch (err: any) {
@@ -166,19 +168,20 @@ export default function DistributorManagement() {
     }
   }
 
-  const handleDeleteConfirm = (id: string) => {
-    setCurrentDistributorId(id)
+  const handleDeleteConfirm = (_id: string) => {
+    setCurrentDistributorId(_id)
     setIsDeleteDialogOpen(true)
   }
 
   const handleDeleteDistributor = async () => {
     if (!currentDistributorId) return
-
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      setDistributors((prev) => prev.filter((distributor) => distributor.id !== currentDistributorId))
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors/${currentDistributorId}`, {
+        method: "DELETE",
+      })
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`)
+      const data = await res.json()
+      setDistributors(data)
       setIsDeleteDialogOpen(false)
       setCurrentDistributorId(null)
     } catch (err: any) {
@@ -308,7 +311,7 @@ export default function DistributorManagement() {
           ) : (
             <div className="space-y-4">
               {distributors.map((distributor) => (
-                <Card key={distributor.id} className="overflow-hidden">
+                <Card key={distributor._id} className="overflow-hidden">
                   <div className="grid grid-cols-1 md:grid-cols-3">
                     <div className="relative h-48 md:h-full">
                       {distributor.image ? (
@@ -337,7 +340,7 @@ export default function DistributorManagement() {
                             <Pencil className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteConfirm(distributor.id)}>
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteConfirm(distributor._id)}>
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Delete</span>
                           </Button>

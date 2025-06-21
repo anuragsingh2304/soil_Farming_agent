@@ -7,6 +7,7 @@ import type { User } from "./mock-data"
 type AuthContextType = {
   user: User | null
   loading: boolean
+  isInitializing: boolean // Add state to track initial load from storage
   login: (email: string, password: string) => Promise<void>
   adminLogin: (email: string, password: string) => Promise<void>
   register: (email: string, password: string, name: string) => Promise<void>
@@ -17,51 +18,69 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false) // Keep for action loading
+  const [isInitializing, setIsInitializing] = useState(true) // New state for initial load
   const router = useRouter()
 
-  // Simulate loading auth state on mount
+  // Load auth state from localStorage on mount (client side)
   useEffect(() => {
     // Check if user is stored in localStorage
     try {
-      const storedUser = localStorage.getItem("currentUser")
-      if (storedUser) {
-        setUser(JSON.parse(storedUser))
-      }
+      
+      currentUser()
     } catch (error) {
-      console.error("Error loading user from localStorage:", error)
+      console.error("Error getting user:", error);
+    } finally {
+      setIsInitializing(false);
     }
   }, [])
+
+  const currentUser = async ()=> {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/user`, {
+          credentials: "include"
+        });
+
+        if(!res.ok) {
+          setUser(null)
+          router.push('/user-login')
+        }
+        const Data = await res.json()
+        setUser(Data)
+      }
+
 
   // Regular user login - simplified for UI testing
   const login = async (email: string, password: string) => {
     try {
       setLoading(true)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // For UI testing, allow any email containing "user" to log in
-      if (email.includes("user")) {
-        const testUser = {
-          uid: "user-test",
-          email: email,
-          name: "Test User",
-          role: "user" as const,
-        }
-
-        setUser(testUser)
-        try {
-          localStorage.setItem("currentUser", JSON.stringify(testUser))
-        } catch (error) {
-          console.error("Error saving to localStorage:", error)
-        }
-
-        router.push("/user-dashboard")
-        return
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
+      });
+    
+      const data = await response.json();
+    
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+    
+      // Assuming backend returns user data on success
+      const loggedInUser = {
+        uid: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        isAdmin: data.user.isAdmin,
       }
 
-      throw new Error("Invalid email or password")
+      // Update state - useEffect will handle saving to localStorage
+        setUser(loggedInUser) // Corrected variable name
+        router.push("/user-dashboard")
+        return
+      // Removed the unconditional throw new Error("Invalid email or password") as backend response handles this
     } catch (error: any) {
       console.error("Login error:", error.message)
       throw error
@@ -70,64 +89,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Admin login - simplified for UI testing
   const adminLogin = async (email: string, password: string) => {
     try {
-      setLoading(true)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // For UI testing, allow any email containing "admin" to log in
-      if (email.includes("admin")) {
-        const testAdmin = {
-          uid: "admin-test",
-          email: email,
-          name: "Test Admin",
-          role: "admin" as const,
-        }
-
-        setUser(testAdmin)
-        try {
-          localStorage.setItem("currentUser", JSON.stringify(testAdmin))
-        } catch (error) {
-          console.error("Error saving to localStorage:", error)
-        }
-
-        router.push("/admin-dashboard")
-        return
+      setLoading(true);
+  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
+      });
+  
+      const data = await response.json();
+      console.log(data)
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
-
-      throw new Error("Invalid admin credentials")
+  
+      if (!data.user.isAdmin) {
+        throw new Error('Access denied. Not an admin.');
+      }
+  
+      const testAdmin = {
+        uid: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        isAdmin: data.user.isAdmin,
+      };
+  
+      setUser(testAdmin);
+      
+  
+      router.push("/admin-dashboard");
+      return;
     } catch (error: any) {
-      console.error("Admin login error:", error.message)
-      throw error
+      console.error("Admin login error:", error.message);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  // User registration - simplified for UI testing
   const register = async (email: string, password: string, name: string) => {
     try {
       setLoading(true)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/register`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ email, password, name }),
+         credentials: "include"
+       });
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
+       const data = await response.json();
 
-      const newUser: User = {
-        uid: `user-${Date.now()}`,
-        email,
-        name,
-        role: "user",
-      }
+       if (!response.ok) {
+         throw new Error(data.message || 'Registration failed');
+       }
 
+      const newUser: User = data.user; 
       setUser(newUser)
-      try {
-        localStorage.setItem("currentUser", JSON.stringify(newUser))
-      } catch (error) {
-        console.error("Error saving to localStorage:", error)
-      }
 
       router.push("/user-dashboard")
     } catch (error: any) {
@@ -137,21 +162,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     }
   }
-
-  // Logout - simplified for UI testing
   const logout = async () => {
     try {
       setLoading(true)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 300))
-
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/logout`,{
+        credentials: "include"
+      })
       setUser(null)
-      try {
-        localStorage.removeItem("currentUser")
-      } catch (error) {
-        console.error("Error removing from localStorage:", error)
-      }
 
       router.push("/")
     } catch (error: any) {
@@ -163,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, adminLogin, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, isInitializing, login, adminLogin, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

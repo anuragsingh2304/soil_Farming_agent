@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 type Language = "en" | "hi"
-
+// Define Translations type outside the component
 type Translations = {
   [key: string]: {
     en: string
@@ -148,60 +148,122 @@ const translations: Translations = {
     en: "Back to Home",
     hi: "होम पेज पर वापस जाएं",
   },
+
+  //soil names
+  "Alluvial Soil": {
+    en: "Alluvial Soil",
+    hi: "जलोढ़ मिट्टी"
+  },
+  "Black Soil": {
+    en: "Black Soil",
+    hi: "काली मिट्टी"
+  },
+  "Red Soil": {
+    en: "Red Soil",
+    hi: "लाल मिट्टी"
+  },
+  "Laterite Soil": {
+    en: "Laterite Soil",
+    hi: "लेटराइट मिट्टी"
+  },
+  "Desert Soil": {
+    en: "Desert Soil",
+    hi: "रेगिस्तानी मिट्टी"
+  },
+
+  //crops names
+
+  Rice:{
+    hi: "चावल",
+    en: "Rice"
+  },
+  Wheat:{
+    hi: "गेहूं",
+    en: "Wheat"
+  },
+  Sugarcane:{
+    hi: "गन्ना",
+    en: "Sugarcane"
+  },
+  Maize:{
+    hi: "मक्का",
+    en: "Maize"
+  },
 }
 
 type LanguageContextType = {
-  language: Language
+  language: Language 
   setLanguage: (lang: Language) => void
   t: (key: string) => string
+  isInitializing: boolean 
 }
 
+// Initialize with undefined to signify that the language hasn't been loaded from storage yet
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("en")
-  const [isClient, setIsClient] = useState(false)
-
-  // Set isClient to true once component mounts
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+  // Initialize language to a default or null/undefined until localStorage is checked
+  const [language, setLanguageState] = useState<Language | undefined>(undefined)
+  const [isInitializing, setIsInitializing] = useState(true) // State for initial load
 
   // Load language preference from localStorage on client side
   useEffect(() => {
-    if (isClient) {
       try {
         const savedLanguage = localStorage.getItem("language") as Language
+        // Check if savedLanguage is one of the valid Language types
         if (savedLanguage && (savedLanguage === "en" || savedLanguage === "hi")) {
-          setLanguage(savedLanguage)
+          setLanguageState(savedLanguage)
+        } else {
+          // Default to "en" if no language is saved or saved language is invalid
+          setLanguageState("en")
         }
       } catch (error) {
         console.error("Error loading language from localStorage:", error)
+        // Default to "en" in case of an error during loading
+        setLanguageState("en")
+      } finally {
+        setIsInitializing(false) // Ensure isInitializing is set to false
       }
-    }
-  }, [isClient])
+  }, []) // Empty dependency array to run once on mount
 
   // Save language preference to localStorage when it changes
   useEffect(() => {
-    if (isClient) {
+    // Only save if language is not undefined (meaning it has been initialized)
+    if (language !== undefined) {
       try {
         localStorage.setItem("language", language)
       } catch (error) {
         console.error("Error saving language to localStorage:", error)
       }
     }
-  }, [language, isClient])
+  }, [language]) 
+
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+
+  }
 
   // Translation function
-  const t = (key: string): string => {
-    if (translations[key]) {
-      return translations[key][language]
+  const t = (key: string): string => {    
+    const currentLang = language || "en"; 
+    if (translations[key] && translations[key][currentLang]) {
+      return translations[key][currentLang]
     }
     console.warn(`Translation missing for key: ${key}`)
     return key
   }
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+
+  const contextValue = {
+    language: language || "en",
+    setLanguage,
+    t,
+    isInitializing,
+  };
+
+
+  return <LanguageContext.Provider value={contextValue}>{children}</LanguageContext.Provider>
 }
 
 export function useLanguage() {
@@ -209,5 +271,6 @@ export function useLanguage() {
   if (context === undefined) {
     throw new Error("useLanguage must be used within a LanguageProvider")
   }
+  
   return context
 }

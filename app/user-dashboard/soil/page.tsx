@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
-import { mockSoilTypes, type SoilType } from "@/lib/mock-data"
+import type { SoilType } from "@/lib/mock-data"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
@@ -17,16 +17,29 @@ export default function SoilInformation() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Load mock soil types
+  // Load soil types from backend
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setSoilTypes([...mockSoilTypes])
-      setFilteredSoilTypes([...mockSoilTypes])
-      setLoading(false)
-    }, 1000)
+    const fetchSoils = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/soil`, {
+            credentials: "include"
+          }
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch soil data');
+        }
+        const data = await response.json();
+        setSoilTypes(data);
+        setFilteredSoilTypes(data);
+      } catch (error) {
+        console.error('Error fetching soil data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer)
+    fetchSoils();
   }, [])
 
   // Filter soil types based on search term
@@ -77,20 +90,20 @@ export default function SoilInformation() {
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSoilTypes.map((soil) => (
-            <Link href={`/user-dashboard/soil/${soil.id}`} key={soil.id}>
+            <Link href={`/user-dashboard/soil/${soil._id}`} key={soil._id}>
               <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer h-full">
                 <div className="relative h-48 w-full">
                   <Image src={soil.image || "/placeholder.svg"} alt={soil.type} fill className="object-cover" />
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-2">{soil.type}</h3>
+                  <h3 className="font-semibold text-lg mb-2">{t(soil.type)}</h3>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {soil.suitableCrops
                       .split(",")
                       .slice(0, 3)
                       .map((crop, index) => (
                         <Badge key={index} variant="secondary">
-                          {crop.trim()}
+                          {t(crop.trim())}
                         </Badge>
                       ))}
                     {soil.suitableCrops.split(",").length > 3 && (

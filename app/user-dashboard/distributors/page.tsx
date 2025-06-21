@@ -25,35 +25,39 @@ export default function DistributorInformation() {
   const [crops, setCrops] = useState<string[]>([])
   const [availableCities, setAvailableCities] = useState<string[]>([])
 
-  // Load mock distributors
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setDistributors([...mockDistributors])
-      setFilteredDistributors([...mockDistributors])
+    const fetchDistributors = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/distributors`,{
+          credentials: "include"
+        });
+        const data = await response.json();
 
-      // Extract unique regions and crops
-      const regionsSet = new Set<string>()
-      const cropsSet = new Set<string>()
+        setDistributors(data);
+        setFilteredDistributors(data);
 
-      mockDistributors.forEach((distributor) => {
-        regionsSet.add(distributor.region)
+        const regionsSet = new Set<string>();
+        const cropsSet = new Set<string>();
 
-        distributor.supportedCrops.split(",").forEach((crop) => {
-          cropsSet.add(crop.trim())
-        })
-      })
+        data.forEach((distributor: Distributor) => {
+          regionsSet.add(distributor.region);
+          distributor.supportedCrops.split(",").forEach((crop) => {
+            cropsSet.add(crop.trim());
+          });
+        });
 
-      setRegions(Array.from(regionsSet).sort())
-      setCrops(Array.from(cropsSet).sort())
+        setRegions(Array.from(regionsSet).sort());
+        setCrops(Array.from(cropsSet).sort());
+      } catch (error) {
+        console.error("Error fetching distributors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setLoading(false)
-    }, 1000)
+    fetchDistributors();
+  }, []);
 
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Update available cities when state changes
   useEffect(() => {
     if (stateFilter) {
       setAvailableCities(indianCities[stateFilter] || [])
@@ -64,7 +68,7 @@ export default function DistributorInformation() {
     }
   }, [stateFilter])
 
-  // Filter distributors based on search term and filters
+
   useEffect(() => {
     let filtered = distributors
 
@@ -212,7 +216,7 @@ export default function DistributorInformation() {
           </div>
         ) : (
           filteredDistributors.map((distributor) => (
-            <Card key={distributor.id} className="overflow-hidden">
+            <Card key={distributor._id} className="overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-3">
                 <div className="relative h-48 md:h-full">
                   {distributor.image ? (

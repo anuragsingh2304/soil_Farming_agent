@@ -140,7 +140,7 @@ Farming/
 
 
 
-1. **[Anurag Singh](https://github.com/manvesingh) :**
+1. **[Anurag Singh](https://github.com/anuragsingh2304) :**
 - contributed by creating a responsive and optimized Front-end.
 - frontend create in Next.js and tailwindcss 
 - Deployment of Front-end(on Vercel)

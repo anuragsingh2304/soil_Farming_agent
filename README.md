@@ -138,14 +138,17 @@ Farming/
 
 ## 👨‍💻 Contributors
 
-1. **[Atul Mishra](https://github.com/AtulMishra001) :** 
+
+
+1. **[Anurag Singh](https://github.com/manvesingh) :**
+- contributed by creating a responsive and optimized Front-end.
+- frontend create in Next.js and tailwindcss 
+- Deployment of Front-end(on Vercel)
+
+2. **[Atul Mishra](https://github.com/AtulMishra001) :** 
  contributed by 
  - Developing the RESTful API.
- - Integration of Front-end, Back-end.
- - Deployment of Front-end(on Vercel), Back-end(on rander)
-
-2. **[Anurag Singh](https://github.com/manvesingh) :**
-- contributed by creating a responsive and optimized Front-end.
+ - Integration of Front-end, Back-end. Deployment Back-end(on render)
 
 3. **[Praveen Kumar](https://github.com/praveenpal21) :**
 - Contributed by writting Documentation and creating test cases for better development.

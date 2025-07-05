@@ -6,7 +6,7 @@ A full-stack web application designed for small-scale farmers and gardening enth
 
 ## 🔗 Live Links
 
-- **Frontend:** [https://farming-beryl.vercel.app](https://farming-beryl.vercel.app)
+- **Frontend:** [https://v0-farming-chi.vercel.app/](https://v0-farming-chi.vercel.app/)
 - **Backend API:** [https://soilfarming.onrender.com](https://soilfarming.onrender.com)
 
 ---
